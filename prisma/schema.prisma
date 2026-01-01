@@ -1,0 +1,50 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum EventMode {
+  ONLINE
+  OFFLINE
+  HYBRID
+}
+
+model Event {
+  id        String      @id @default(uuid())
+  image     String
+  title     String
+  slug      String?     @unique
+  description String?
+  overview  String?
+  venue     String?
+  location  String?
+  date      String
+  time      String
+  mode      EventMode
+  audience  String?
+  agenda    String?
+  organizer String?
+  tags      String[]
+  bookings  Booking[]
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  @@index([slug])
+}
+
+model Booking {
+  id        String   @id @default(uuid())
+  event     Event    @relation(fields: [eventId], references: [id])
+  eventId   String
+  userEmail String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([eventId])
+  @@index([userEmail])
+}
